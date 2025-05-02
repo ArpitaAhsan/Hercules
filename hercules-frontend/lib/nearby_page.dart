@@ -8,8 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hercules/profile_provider.dart';
 import 'package:http/http.dart' as http;
 
-// ... [imports remain unchanged]
-
 class NearbyPage extends StatefulWidget {
   const NearbyPage({super.key});
 
@@ -23,9 +21,21 @@ class _NearbyPageState extends State<NearbyPage> {
   bool _isLocationLoading = true;
   bool _isProfileFetched = false;
   String? _userId;
-  List<dynamic> _activeAlerts = [];
-  String _rawResponse = '';
-  String _errorMessage = '';
+  List<dynamic> _activeAlerts = []; // List to store active alerts
+  String _rawResponse = ''; // To store the raw API response
+  String _errorMessage = ''; // To store error messages
+
+  // NEW: Dropdown filter variables
+  String _selectedEmergencyType = 'All';
+
+  final Map<String, String> _emergencyTypeColors = {
+    'General Emergency': 'red',
+    'Rape': 'purple',
+    'Riot': 'brown',
+    'Mugging': 'yellow',
+    'Fire': 'orange',
+    'Domestic Violence': 'green',
+  };
 
   @override
   void initState() {
@@ -38,7 +48,9 @@ class _NearbyPageState extends State<NearbyPage> {
     if (_userId != null) {
       await _determinePosition();
       await _fetchUserProfile();
-      await _fetchActiveAlerts();
+      await _fetchActiveAlerts(); // Fetch active alerts from backend
+    } else {
+      print("❌ User ID not found in SharedPreferences.");
     }
   }
 
@@ -75,10 +87,13 @@ class _NearbyPageState extends State<NearbyPage> {
     prefs.setDouble('latitude', position.latitude);
     prefs.setDouble('longitude', position.longitude);
   }
-
+  //  active alert gula dekhanor jonno map e
   Future<void> _fetchActiveAlerts() async {
     try {
       final response = await http.get(Uri.parse('http://192.168.0.103:9062/api/auth/active-alerts'));
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
       if (response.statusCode == 200) {
         setState(() {
           _activeAlerts = json.decode(response.body);
@@ -101,14 +116,22 @@ class _NearbyPageState extends State<NearbyPage> {
 
   Color _getEmergencyColor(String color) {
     switch (color.toLowerCase()) {
-      case 'red': return Colors.red;
-      case 'blue': return Colors.blue;
-      case 'green': return Colors.green;
-      case 'yellow': return Colors.yellow;
-      case 'orange': return Colors.orange;
-      case 'purple': return Colors.purple;
-      case 'brown': return Colors.brown;
-      default: return Colors.grey;
+      case 'red':
+        return Colors.red;
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      case 'yellow':
+        return Colors.yellow;
+      case 'orange':
+        return Colors.orange;
+      case 'purple':
+        return Colors.purple;
+      case 'brown':
+        return Colors.brown;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -148,61 +171,107 @@ class _NearbyPageState extends State<NearbyPage> {
       appBar: AppBar(title: const Text('Nearby Locations')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          initialCenter: _currentPosition ?? LatLng(0, 0),
-          initialZoom: 16.0,
-        ),
+          : Column(
         children: [
-          TileLayer(
-            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: ['a', 'b', 'c'],
-          ),
-          MarkerLayer(
-            markers: [
-              if (_currentPosition != null)
-                Marker(
-                  width: 50,
-                  height: 50,
-                  point: _currentPosition!,
-                  child: profileProvider.isEmergency
-                      ? GestureDetector(
-                    onTap: () => _showAlertDetailsDialog(context, profileProvider),
-                    child: _BlinkingAnimatedIcon(
-                      color: _getEmergencyColor(profileProvider.emergencyAlertColor),
-                      icon: Icons.location_pin,
-                    ),
-                  )
-                      : Icon(
-                    Icons.location_pin,
-                    color: Colors.blue,
-                    size: 40,
-                  ),
+          // NEW: Dropdown filter button
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                const Text('Filter: ', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                DropdownButton<String>(
+                  value: _selectedEmergencyType,
+                  items: [
+                    const DropdownMenuItem(value: 'All', child: Text('All')),
+                    ..._emergencyTypeColors.keys.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(type),
+                      );
+                    }).toList(),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedEmergencyType = value!;
+                    });
+                  },
                 ),
-              ..._activeAlerts.map<Marker?>((alert) {
-                final coords = alert['location']?['coordinates'];
-                if (coords != null && coords.length == 2) {
-                  final lat = coords[1] is double ? coords[1] : coords[1].toDouble();
-                  final lng = coords[0] is double ? coords[0] : coords[0].toDouble();
-                  return Marker(
-                    width: 50,
-                    height: 50,
-                    point: LatLng(lat, lng),
-                    child: GestureDetector(
-                      onTap: () => _showAlertDetailsDialog(context, alert),
-                      child: Icon(
-                        Icons.circle,
-                        color: _getEmergencyColor(alert['alertColor']),
-                        size: 20,
+              ],
+            ),
+          ),
+          Expanded(
+            child: FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: _currentPosition ?? LatLng(0, 0),
+                initialZoom: 16.0,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
+                ),
+                MarkerLayer(
+                  markers: [
+                    if (_currentPosition != null)
+                      Marker(
+                        width: 50,
+                        height: 50,
+                        point: _currentPosition!,
+                        child: profileProvider.isEmergency
+                            ? GestureDetector(
+                          onTap: () => _showAlertDetailsDialog(context, profileProvider),
+                          child: _BlinkingAnimatedIcon(
+                            color: _getEmergencyColor(profileProvider.emergencyAlertColor),
+                            icon: Icons.location_pin,
+                          ),
+                        )
+                            : Icon(
+                          Icons.location_pin,
+                          color: Colors.blue,
+                          size: 40,
+                        ),
                       ),
-                    ),
-                  );
-                } else {
-                  return null;
-                }
-              }).whereType<Marker>().toList(),
-            ],
+                    ..._activeAlerts
+                        .where((alert) {
+                      if (_selectedEmergencyType == 'All') return true;
+                      return alert['emergencyType']?.toString().toLowerCase() ==
+                          _selectedEmergencyType.toLowerCase();
+                    })
+                        .map<Marker?>((alert) {
+                      final alertCoordinates = alert['location']?['coordinates'];
+                      if (alertCoordinates != null && alertCoordinates.length == 2) {
+                        final alertLat = alertCoordinates[1] is double
+                            ? alertCoordinates[1]
+                            : alertCoordinates[1].toDouble();
+                        final alertLng = alertCoordinates[0] is double
+                            ? alertCoordinates[0]
+                            : alertCoordinates[0].toDouble();
+
+                        return Marker(
+                          width: 50,
+                          height: 50,
+                          point: LatLng(alertLat, alertLng),
+                          child: GestureDetector(
+                            onTap: () => _showAlertDetailsDialog(context, alert),
+                            child: Icon(
+                              Icons.circle,
+                              color: _getEmergencyColor(alert['alertColor']),
+                              size: 20,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return null;
+                      }
+                    })
+                        .whereType<Marker>()
+                        .toList(),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -214,7 +283,10 @@ class _BlinkingAnimatedIcon extends StatefulWidget {
   final Color color;
   final IconData icon;
 
-  const _BlinkingAnimatedIcon({required this.color, required this.icon});
+  const _BlinkingAnimatedIcon({
+    required this.color,
+    required this.icon,
+  });
 
   @override
   State<_BlinkingAnimatedIcon> createState() => _BlinkingAnimatedIconState();
