@@ -1,12 +1,11 @@
-import 'package:/hercules/api_root.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String _baseUrl = apiRoot;
+  static const String _baseUrl = "https://hercules-ddlq.onrender.com/api/auth";
 
-  // Register User
+  // Register Userz
   static Future<Map<String, dynamic>> registerUser({
     required String name,
     required String email,
@@ -265,7 +264,7 @@ class ApiService {
   }
 // Mark Alert as Done
   static Future<Map<String, dynamic>> markAlertAsDone(String alertId) async {
-    final url = Uri.parse('$_baseUrl/auth/alert/finish/$alertId');
+    final url = Uri.parse('$_baseUrl/api/auth/alert/finish/$alertId');
 
     try {
       final response = await http.put(

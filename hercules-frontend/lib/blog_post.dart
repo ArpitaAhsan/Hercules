@@ -23,7 +23,7 @@ class _BlogPostPageState extends State<BlogPostPage> {
 
   Future<void> fetchBlogs() async {
     setState(() => isLoading = true);
-    final url = Uri.parse("https://hercules-ddlq.onrender.com/api/auth/active");
+    final url = Uri.parse("http://192.168.153.203:9308/api/auth/active");
 
     try {
       final response = await http.get(url);
@@ -43,7 +43,7 @@ class _BlogPostPageState extends State<BlogPostPage> {
   }
 
   Future<void> markBlogAsDone(String blogId) async {
-    final url = Uri.parse("https://hercules-ddlq.onrender.com/api/auth/done/$blogId");
+    final url = Uri.parse("http://192.168.153.203:9308/api/auth/done/$blogId");
 
     try {
       final response = await http.put(url);
@@ -68,7 +68,7 @@ class _BlogPostPageState extends State<BlogPostPage> {
       String date,
       String time,
       ) async {
-    final url = Uri.parse("https://hercules-ddlq.onrender.com/api/auth/create");
+    final url = Uri.parse("http://192.168.153.203:9308/api/auth/create");
 
     try {
       final response = await http.post(
@@ -114,7 +114,7 @@ class _BlogPostPageState extends State<BlogPostPage> {
     }
 
     // Fetch the user's ObjectId from their email address
-    final url = Uri.parse("https://hercules-ddlq.onrender.com/api/auth/getUserIdByEmail/$email");
+    final url = Uri.parse("http://192.168.153.203:9308/api/auth/getUserIdByEmail/$email");
 
     try {
       final response = await http.get(url);
@@ -123,7 +123,7 @@ class _BlogPostPageState extends State<BlogPostPage> {
         final userId = data['userId'];  // Assuming the response contains the userId
 
         // Now, send the user's ObjectId with the blog response
-        final respondUrl = Uri.parse("https://hercules-ddlq.onrender.com/api/auth/respond/$blogId/$userId");
+        final respondUrl = Uri.parse("http://192.168.153.203:9308/api/auth/respond/$blogId/$userId");
 
         final respondResponse = await http.post(respondUrl);
         if (respondResponse.statusCode == 200) {
