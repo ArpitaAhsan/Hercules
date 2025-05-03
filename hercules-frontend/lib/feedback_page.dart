@@ -42,7 +42,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Future<List<FeedbackModel>> fetchFeedbacks() async {
-    const String apiUrl = 'http://192.168.0.114:1518/api/auth/feedback/all'; // <-- Update this with your actual backend URL
+    const String apiUrl = 'https://hercules-ddlq.onrender.com/api/auth/feedback/all'; // <-- Update this with your actual backend URL
 
     final response = await http.get(Uri.parse(apiUrl));
 
