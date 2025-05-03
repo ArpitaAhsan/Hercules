@@ -265,7 +265,7 @@ class ApiService {
   }
 // Mark Alert as Done
   static Future<Map<String, dynamic>> markAlertAsDone(String alertId) async {
-    final url = Uri.parse('$_baseUrl/api/auth/alert/finish/$alertId');
+    final url = Uri.parse('$_baseUrl/auth/alert/finish/$alertId');
 
     try {
       final response = await http.put(
