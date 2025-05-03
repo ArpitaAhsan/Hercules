@@ -90,7 +90,7 @@ class _NearbyPageState extends State<NearbyPage> {
   //  active alert gula dekhanor jonno map e
   Future<void> _fetchActiveAlerts() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.0.103:9062/api/auth/active-alerts'));
+      final response = await http.get(Uri.parse('https://hercules-ddlq.onrender.com/api/auth/active-alerts'));
       print("Response Status: ${response.statusCode}");
       print("Response Body: ${response.body}");
 

@@ -1,0 +1,2 @@
+D:/Hercules/hercules-frontend/android/app/.cxx/Debug/2p6g2352/x86_64/CMakeFiles/edit_cache.dir
+D:/Hercules/hercules-frontend/android/app/.cxx/Debug/2p6g2352/x86_64/CMakeFiles/rebuild_cache.dir

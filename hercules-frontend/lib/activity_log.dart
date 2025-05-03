@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hercules/profile_page.dart';
 import 'package:hercules/nearby_page.dart';
 
-const String apiBaseUrl = "http://192.168.141.118:9062"; // Your local backend
+const String apiBaseUrl = "https://hercules-ddlq.onrender.com"; // Your local backend
 
 class ActivityLogPage extends StatefulWidget {
   const ActivityLogPage({super.key});
