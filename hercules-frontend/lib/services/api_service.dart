@@ -1,9 +1,10 @@
+import 'package:/hercules/api_root.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String _baseUrl = "https://hercules-ddlq.onrender.com/api/auth";
+  static const String _baseUrl = apiRoot;
 
   // Register User
   static Future<Map<String, dynamic>> registerUser({
