@@ -87,7 +87,7 @@ class _NearbyPageState extends State<NearbyPage> {
     prefs.setDouble('latitude', position.latitude);
     prefs.setDouble('longitude', position.longitude);
   }
-  //  active alert gula dekhanor jonno map e
+
   Future<void> _fetchActiveAlerts() async {
     try {
       final response = await http.get(Uri.parse('https://hercules-ddlq.onrender.com/api/auth/active-alerts'));
